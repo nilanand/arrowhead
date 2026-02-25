@@ -1,7 +1,7 @@
 # arrowhead
 
 ## overview
-arrowhead is tool I developed for observing market structure and regime context.
+arrowhead is a tool I developed for observing market structure and regime context.
 The UI uses a command-terminal style that is primarily monochrome (black/white) with limited semantic green/red states.
 Temporary development artifacts matching `.tmp_*` are removed from the repository and ignored by default.
 
