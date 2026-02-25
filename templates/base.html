@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page_title or 'Arrowhead' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body class="terminal-mode" data-page="{{ page_id or '' }}">
+  <main class="shell">
+    <header class="topbar">
+      <div class="topbar-left"></div>
+      <a class="brand" href="/dashboard">Arrowhead</a>
+      <div class="topbar-right">
+        <a class="navlink{% if request.path.startswith('/dashboard') %} active{% endif %}" href="/dashboard">dashboard</a>
+      </div>
+    </header>
+
+    {% block content %}{% endblock %}
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='charts.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

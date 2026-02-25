@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Market Spreads</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="market">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Best/second-best BIN spread snapshots</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Spread Snapshots</h2>
+          <div class="status-meta" id="marketMeta">Loading market spreads...</div>
+        </div>
+      </div>
+
+      <form id="marketForm" class="filter-grid" autocomplete="off" style="grid-template-columns: 2fr 1fr auto;">
+        <div class="field">
+          <label for="marketItemKey">Item key</label>
+          <select id="marketItemKey"></select>
+        </div>
+        <div class="field">
+          <label for="marketHours">Hours</label>
+          <select id="marketHours">
+            <option value="1">1h</option>
+            <option value="6" selected>6h</option>
+            <option value="12">12h</option>
+            <option value="24">24h</option>
+            <option value="48">48h</option>
+          </select>
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button type="submit">Refresh</button>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Best BIN</th>
+              <th>Second Best BIN</th>
+              <th>Spread Abs</th>
+              <th>Spread %</th>
+              <th>Active Listings</th>
+            </tr>
+          </thead>
+          <tbody id="marketSpreadsBody">
+            <tr><td colspan="6">Loading spread snapshots...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

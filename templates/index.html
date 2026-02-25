@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | AH Browser</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="index">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Auction browser + predictive flipping engine</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <div class="status-line">
+            <span id="statusPill" class="health warn">
+              <span id="statusDot" class="dot dot-warn"></span>
+              <span id="statusText">Loading...</span>
+            </span>
+            <span class="meta" id="statusMeta"></span>
+          </div>
+        </div>
+        <div class="inline-actions">
+          <button type="button" id="fetchNowBtn">Fetch Now</button>
+        </div>
+      </div>
+      <div class="error-box" id="statusError" style="display:none;"></div>
+
+      <form id="filtersForm" class="filter-grid" autocomplete="off">
+        <div class="field">
+          <label for="query">Search</label>
+          <input id="query" name="query" type="text" placeholder="Item name contains..." />
+        </div>
+        <div class="field">
+          <label for="bin">BIN</label>
+          <select id="bin" name="bin">
+            <option value="">All</option>
+            <option value="1">BIN only</option>
+            <option value="0">Auction only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="tier">Tier</label>
+          <select id="tier" name="tier">
+            <option value="">All tiers</option>
+            <option value="COMMON">COMMON</option>
+            <option value="UNCOMMON">UNCOMMON</option>
+            <option value="RARE">RARE</option>
+            <option value="EPIC">EPIC</option>
+            <option value="LEGENDARY">LEGENDARY</option>
+            <option value="MYTHIC">MYTHIC</option>
+            <option value="DIVINE">DIVINE</option>
+            <option value="SPECIAL">SPECIAL</option>
+            <option value="VERY_SPECIAL">VERY_SPECIAL</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="minPrice">Min Price</label>
+          <input id="minPrice" name="min_price" type="number" min="0" step="1" placeholder="0" />
+        </div>
+        <div class="field">
+          <label for="maxPrice">Max Price</label>
+          <input id="maxPrice" name="max_price" type="number" min="0" step="1" placeholder="1000000" />
+        </div>
+        <div class="field">
+          <label for="sort">Sort</label>
+          <select id="sort" name="sort">
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price ↑</option>
+            <option value="price_desc">Price ↓</option>
+            <option value="ending_soon">Ending soon</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="endingSoon">Ending soon</label>
+          <div class="checkbox-wrap">
+            <input id="endingSoon" name="ending_soon" type="checkbox" value="1" />
+            <span class="help">Within 15m</span>
+          </div>
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <input type="submit" value="Apply" />
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>BIN</th>
+              <th>Tier</th>
+              <th>Price</th>
+              <th>Ends In</th>
+              <th>Seller</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr><td colspan="7">Loading auctions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn secondary" id="prevPageBtn" type="button">Prev</button>
+        <span id="pageInfo">Page 1</span>
+        <button class="btn secondary" id="nextPageBtn" type="button">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

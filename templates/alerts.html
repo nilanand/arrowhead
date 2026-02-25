@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Alerts</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="alerts">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Discord shark + watchlist dip alerts history</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Last Alerts Sent</h2>
+          <div class="status-meta" id="alertsMeta">Loading alerts...</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Item Key</th>
+              <th>UUID</th>
+              <th>Snippet</th>
+            </tr>
+          </thead>
+          <tbody id="alertsBody">
+            <tr><td colspan="5">Loading alerts...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

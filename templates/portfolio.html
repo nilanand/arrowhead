@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Portfolio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="portfolio">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Paper trading positions</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Open Positions</h2>
+          <div class="status-meta" id="portfolioMeta">Loading positions...</div>
+        </div>
+      </div>
+      <div class="status-meta" id="portfolioSummary">Loading closed-trade summary...</div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Item Key</th>
+              <th>Entry</th>
+              <th>Current</th>
+              <th>Unrealized PnL</th>
+              <th>Opened</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="openPositionsBody">
+            <tr><td colspan="8">Loading open positions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Closed Positions</h2>
+      <div class="table-wrap" style="margin-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Item Key</th>
+              <th>Entry</th>
+              <th>Exit</th>
+              <th>PnL After Fee</th>
+              <th>Profit / Hour</th>
+              <th>Duration</th>
+              <th>Opened</th>
+              <th>Closed</th>
+            </tr>
+          </thead>
+          <tbody id="closedPositionsBody">
+            <tr><td colspan="9">Loading closed positions...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

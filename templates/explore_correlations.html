@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Correlations</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="correlations">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">cross-asset and sector correlation matrix</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="corrMeta">Loading correlations...</div>
+        <div class="inline-actions">
+          <input id="corrSymbols" type="text" value="SPY,QQQ,DIA,IWM,TLT,GLD,USO,XLK,XLF,XLE,XLV" style="min-width:340px;" />
+          <button type="button" id="corrRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="corrTable">
+          <thead id="corrHead"></thead>
+          <tbody id="corrBody"><tr><td>Loading correlations...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

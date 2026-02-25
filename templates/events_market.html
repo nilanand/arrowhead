@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Events</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="events">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">market structural event stream</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="eventsMeta">Loading events...</div>
+        <div class="inline-actions">
+          <input id="eventsSymbol" type="text" placeholder="symbol (optional)" style="width:150px; text-transform:uppercase;" />
+          <input id="eventsType" type="text" placeholder="event type (optional)" style="width:220px;" />
+          <button type="button" id="eventsRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Symbol</th><th>Type</th><th>Severity</th><th>Details</th></tr></thead>
+          <tbody id="eventsRows"><tr><td colspan="5">Loading events...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

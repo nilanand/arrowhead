@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Alerts</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="alerts">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">high-interest equities alerts only</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="alertsMeta">Loading alerts...</div>
+        <div class="inline-actions">
+          <button type="button" id="alertsRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Type</th><th>Symbol</th><th>Payload</th></tr></thead>
+          <tbody id="alertsRows"><tr><td colspan="4">Loading alerts...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

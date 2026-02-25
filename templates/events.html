@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Events</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="events">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Canonical item storybook events</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Market Events</h2>
+          <div class="status-meta" id="eventsMeta">Loading events...</div>
+        </div>
+      </div>
+
+      <form id="eventsForm" class="filter-grid" autocomplete="off" style="grid-template-columns: 1fr 1fr auto;">
+        <div class="field">
+          <label for="eventsType">Event Type</label>
+          <select id="eventsType">
+            <option value="">All</option>
+            <option value="NEW_ATH">NEW_ATH</option>
+            <option value="NEW_ATL">NEW_ATL</option>
+            <option value="REGIME_CHANGE">REGIME_CHANGE</option>
+            <option value="BIG_SPREAD_SPIKE">BIG_SPREAD_SPIKE</option>
+            <option value="BIG_DRAWDOWN">BIG_DRAWDOWN</option>
+            <option value="nocom_CONFIDENCE_DROP">nocom_CONFIDENCE_DROP</option>
+            <option value="LIQUIDITY_DROP">LIQUIDITY_DROP</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="eventsLimit">Limit</label>
+          <input id="eventsLimit" type="number" min="1" step="1" value="200" />
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button type="submit">Refresh</button>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Item Key</th>
+              <th>Severity</th>
+              <th>Title</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="eventsBody">
+            <tr><td colspan="6">Loading events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

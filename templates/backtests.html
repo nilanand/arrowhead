@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Backtests</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="backtests">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Strategy transparency and validation</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Best Backtests</h2>
+          <div class="status-meta" id="backtestMeta">Loading backtest results...</div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>Trades</th>
+              <th>Win Rate</th>
+              <th>Avg Return</th>
+              <th>Max Drawdown</th>
+              <th>Lookback</th>
+            </tr>
+          </thead>
+          <tbody id="bestBacktestsBody">
+            <tr><td colspan="6">Loading best backtests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Worst Backtests</h2>
+      <div class="table-wrap" style="margin-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>Trades</th>
+              <th>Win Rate</th>
+              <th>Avg Return</th>
+              <th>Max Drawdown</th>
+              <th>Lookback</th>
+            </tr>
+          </thead>
+          <tbody id="worstBacktestsBody">
+            <tr><td colspan="6">Loading worst backtests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">All Latest Backtests</h2>
+      <div class="table-wrap" style="margin-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>Trades</th>
+              <th>Win Rate</th>
+              <th>Avg Return</th>
+              <th>Max Drawdown</th>
+              <th>Lookback</th>
+            </tr>
+          </thead>
+          <tbody id="allBacktestsBody">
+            <tr><td colspan="6">Loading all backtests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="section-title">price + trend</div>
+  <div class="inline-actions" style="margin-bottom:10px;">
+    <a class="btn secondary" href="/dashboard">back to dashboard</a>
+    <span class="badge mono">symbol {{ symbol }}</span>
+    <span class="badge mono">tf</span>
+    <button type="button" class="btn secondary tf-btn {% if selected_tf == '1d' %}active{% endif %}" data-tf="1d">1D</button>
+    <button type="button" class="btn secondary tf-btn {% if selected_tf == '1m' %}active{% endif %}" data-tf="1m">1M</button>
+    <button type="button" class="btn secondary tf-btn {% if selected_tf == '5m' %}active{% endif %}" data-tf="5m">5M</button>
+    <button type="button" class="btn secondary tf-btn {% if selected_tf == '15m' %}active{% endif %}" data-tf="15m">15M</button>
+    <span id="symbolTfLabel" class="badge mono">TF: 1d</span>
+  </div>
+  <div class="chart-wrap symbol-price-wrap">
+    <canvas id="symbolPriceChart" class="chart-canvas"></canvas>
+  </div>
+  <p id="symbolDataMessage" class="help mono" style="margin-top:10px; display:none;"></p>
+</section>
+
+<section class="panel">
+  <div class="section-title">context</div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="kpi-sub mono">dist from 52w high</div>
+      <div id="ctxDist52w" class="kpi mono">{{ "%+.2f%%"|format(latest_feature.dist_from_52w_high * 100) if latest_feature and latest_feature.dist_from_52w_high is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">vol percentile 252d</div>
+      <div id="ctxVolPct" class="kpi mono">{{ "%.1f"|format(latest_feature.vol_percentile_252d * 100) if latest_feature and latest_feature.vol_percentile_252d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">trend strength 200d</div>
+      <div id="ctxTrend200" class="kpi mono">{{ "%+.6f"|format(latest_feature.trend_strength_200d) if latest_feature and latest_feature.trend_strength_200d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">drawdown 252d</div>
+      <div id="ctxDrawdown" class="kpi mono">{{ "%.2f%%"|format(latest_feature.drawdown_252d * 100) if latest_feature and latest_feature.drawdown_252d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">regime</div>
+      <div id="ctxRegime" class="kpi">{{ latest_feature.regime_tag if latest_feature else "CHOP" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">last bar</div>
+      <div id="ctxDate" class="kpi mono">{{ ts_to_date(latest_bar.bar_ts) if latest_bar else "—" }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">risk</div>
+  <div class="chart-wrap symbol-risk-wrap">
+    <canvas id="symbolRiskChart" class="chart-canvas"></canvas>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">historical continuation (descriptive)</div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="kpi-sub mono">cont_prob_5d</div>
+      <div class="kpi mono">{{ "%.0f%%"|format(latest_feature.cont_prob_5d * 100) if latest_feature and latest_feature.cont_prob_5d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">exp_return_5d</div>
+      <div class="kpi mono">{{ "%+.2f%%"|format(latest_feature.exp_return_5d * 100) if latest_feature and latest_feature.exp_return_5d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">cont_samples_5d</div>
+      <div class="kpi mono">{{ latest_feature.cont_samples_5d if latest_feature and latest_feature.cont_samples_5d is not none else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">mom_strength</div>
+      <div class="kpi mono">{{ "%+.2f"|format(latest_feature.mom_strength) if latest_feature and latest_feature.mom_strength is not none else "—" }}</div>
+    </div>
+  </div>
+  <p class="help" style="margin-top:12px;">This is a descriptive historical continuation statistic, not a trading signal.</p>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+  const C = window.ArrowheadCharts;
+  if (typeof Chart === "undefined" || !C) {
+    return;
+  }
+  const WHITE = C.THEME.WHITE;
+
+  const symbol = "{{ symbol }}";
+  const tfButtons = Array.from(document.querySelectorAll(".tf-btn"));
+  const tfLabel = document.getElementById("symbolTfLabel");
+  const dataMessage = document.getElementById("symbolDataMessage");
+  const ctxDist52w = document.getElementById("ctxDist52w");
+  const ctxVolPct = document.getElementById("ctxVolPct");
+  const ctxTrend200 = document.getElementById("ctxTrend200");
+  const ctxDrawdown = document.getElementById("ctxDrawdown");
+  const ctxRegime = document.getElementById("ctxRegime");
+  const ctxDate = document.getElementById("ctxDate");
+  const priceEl = document.getElementById("symbolPriceChart");
+  const riskEl = document.getElementById("symbolRiskChart");
+  if (!priceEl || !riskEl) {
+    return;
+  }
+
+  const ALLOWED_TFS = new Set(["1d", "1m", "5m", "15m"]);
+  const INTRADAY_TFS = new Set(["1m", "5m", "15m"]);
+  const urlParams = new URLSearchParams(window.location.search);
+
+  const normalizeTf = (tf) => {
+    const value = String(tf || "").trim().toLowerCase();
+    return ALLOWED_TFS.has(value) ? value : "1d";
+  };
+
+  let selectedTf = normalizeTf(urlParams.get("tf") || "{{ selected_tf if selected_tf else '1d' }}");
+  const PRICE_CHART_ID = "symbolPriceChart";
+  const RISK_CHART_ID = "symbolRiskChart";
+
+  const fmtPct = (v, digits = 1) => (v === null || v === undefined ? "—" : `${(v * 100).toFixed(digits)}%`);
+  const fmtSignedPct = (v, digits = 2) => (v === null || v === undefined ? "—" : `${v >= 0 ? "+" : ""}${(v * 100).toFixed(digits)}%`);
+  const fmtSigned = (v, digits = 6) => (v === null || v === undefined ? "—" : `${v >= 0 ? "+" : ""}${Number(v).toFixed(digits)}`);
+
+  const setDataMessage = (text) => {
+    if (!dataMessage) {
+      return;
+    }
+    dataMessage.textContent = text ? String(text) : "";
+    dataMessage.style.display = text ? "block" : "none";
+  };
+
+  const setTfLabel = (tf) => {
+    if (!tfLabel) {
+      return;
+    }
+    if (INTRADAY_TFS.has(tf)) {
+      tfLabel.textContent = `TF: ${tf} (intraday, 7d window)`;
+      return;
+    }
+    tfLabel.textContent = "TF: 1d";
+  };
+
+  const regimePlugin = {
+    id: "regimeShading",
+    beforeDatasetsDraw(chart, _args, options) {
+      const regimes = (options && options.regimes) || [];
+      if (!regimes.length) return;
+      const {ctx, chartArea, scales} = chart;
+      if (!chartArea || !scales || !scales.x) return;
+      const x = scales.x;
+      const top = chartArea.top;
+      const bottom = chartArea.bottom;
+      ctx.save();
+      for (let i = 0; i < regimes.length; i += 1) {
+        const tag = String(regimes[i] || "CHOP").toUpperCase();
+        if (tag === "CHOP") continue;
+        const center = x.getPixelForValue(i);
+        const left = i > 0 ? (x.getPixelForValue(i - 1) + center) / 2 : chartArea.left;
+        const right = i < regimes.length - 1 ? (center + x.getPixelForValue(i + 1)) / 2 : chartArea.right;
+        ctx.fillStyle = tag === "BULL" ? "rgba(255,255,255,0.035)" : "rgba(0,0,0,0.22)";
+        ctx.fillRect(left, top, Math.max(1, right - left), bottom - top);
+      }
+      ctx.restore();
+    }
+  };
+
+  if (!Chart.registry.plugins.get("regimeShading")) {
+    Chart.register(regimePlugin);
+  }
+
+  function getPriceChart() {
+    return C.getOrCreateChart(PRICE_CHART_ID, () => ({
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          { label: "Close", data: [], borderColor: WHITE, borderWidth: 1.6, pointRadius: 0, tension: 0.08, spanGaps: true },
+          { label: "EMA20", data: [], borderColor: "rgba(255,255,255,0.65)", borderWidth: 1, pointRadius: 0, tension: 0.08, spanGaps: true },
+          { label: "EMA50", data: [], borderColor: "rgba(255,255,255,0.40)", borderWidth: 1, pointRadius: 0, tension: 0.08, spanGaps: true },
+          { label: "EMA200", data: [], borderColor: "rgba(255,255,255,0.25)", borderWidth: 1, pointRadius: 0, tension: 0.08, spanGaps: true }
+        ]
+      },
+      options: C.commonOptions({
+        plugins: {
+          regimeShading: { regimes: [] }
+        }
+      })
+    }));
+  }
+
+  function getRiskChart() {
+    return C.getOrCreateChart(RISK_CHART_ID, () => ({
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          { label: "Vol 20d", data: [], borderColor: WHITE, borderWidth: 1, pointRadius: 0, tension: 0.08, spanGaps: true },
+          { label: "Drawdown 252d", data: [], borderColor: "rgba(255,255,255,0.4)", borderWidth: 1, pointRadius: 0, tension: 0.08, spanGaps: true }
+        ]
+      },
+      options: C.commonOptions()
+    }));
+  }
+
+  function sanitizeRows(rawRows) {
+    const rows = Array.isArray(rawRows) ? rawRows : [];
+    const keyed = new Map();
+    for (const row of rows) {
+      const dateLabel = String(row?.date || "").trim();
+      if (!dateLabel) {
+        continue;
+      }
+      keyed.set(dateLabel, {
+        ...row,
+        date: dateLabel,
+      });
+    }
+    return Array.from(keyed.values()).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  }
+
+  const setActiveTf = (tf) => {
+    selectedTf = normalizeTf(tf);
+    tfButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.tf === selectedTf);
+    });
+    setTfLabel(selectedTf);
+    const nextUrl = new URL(window.location.href);
+    nextUrl.searchParams.set("tf", selectedTf);
+    const nextQuery = nextUrl.searchParams.toString();
+    const nextPath = nextQuery ? `${window.location.pathname}?${nextQuery}` : window.location.pathname;
+    window.history.replaceState({}, "", nextPath);
+  };
+
+  const updateContext = (latest) => {
+    if (!latest) {
+      return;
+    }
+    if (INTRADAY_TFS.has(selectedTf)) {
+      ctxDate.textContent = latest.date || "—";
+      return;
+    }
+    ctxDist52w.textContent = fmtSignedPct(latest.dist_from_52w_high, 2);
+    ctxVolPct.textContent = latest.vol_percentile_252d === null || latest.vol_percentile_252d === undefined
+      ? "—"
+      : (latest.vol_percentile_252d * 100).toFixed(1);
+    ctxTrend200.textContent = fmtSigned(latest.trend_strength_200d, 6);
+    ctxDrawdown.textContent = fmtPct(latest.drawdown_252d, 2);
+    ctxRegime.textContent = latest.regime_tag || "CHOP";
+    ctxDate.textContent = latest.date || "—";
+  };
+
+  const renderCharts = (rows) => {
+    const priceChart = getPriceChart();
+    const riskChart = getRiskChart();
+    if (!priceChart || !riskChart) {
+      return;
+    }
+    if (!rows.length) {
+      C.updateChart(priceChart, [], [[], [], [], []]);
+      C.updateChart(riskChart, [], [[], []]);
+      if (priceChart.options?.plugins?.regimeShading) {
+        priceChart.options.plugins.regimeShading.regimes = [];
+      }
+      if (INTRADAY_TFS.has(selectedTf)) {
+        setDataMessage("No intraday bars yet. Enable INTRADAY_ENABLED and wait for ingestion.");
+      } else {
+        setDataMessage("");
+      }
+      priceChart.update("none");
+      return;
+    }
+    setDataMessage("");
+
+    const labels = rows.map((d) => String(d.date || ""));
+    const closeSeries = rows.map((d) => C.toFiniteOrNull(d?.close));
+    const ema20Series = rows.map((d) => C.toFiniteOrNull(d?.ema_20));
+    const ema50Series = rows.map((d) => C.toFiniteOrNull(d?.ema_50));
+    const ema200Series = rows.map((d) => C.toFiniteOrNull(d?.ema_200));
+    const volSeries = rows.map((d) => C.toFiniteOrNull(d?.vol_20d));
+    const drawdownSeries = rows.map((d) => C.toFiniteOrNull(d?.drawdown_252d));
+    const regimes = rows.map((d) => String(d?.regime_tag || "CHOP"));
+
+    const maxPoints = INTRADAY_TFS.has(selectedTf) ? 1200 : 1200;
+    const sampledPrice = C.downsampleEven(
+      labels,
+      [closeSeries, ema20Series, ema50Series, ema200Series, regimes],
+      maxPoints
+    );
+    const sampledRisk = C.downsampleEven(labels, [volSeries, drawdownSeries], maxPoints);
+
+    C.updateChart(priceChart, sampledPrice.labels, sampledPrice.series.slice(0, 4));
+    C.updateChart(riskChart, sampledRisk.labels, sampledRisk.series);
+    if (priceChart.options?.plugins?.regimeShading) {
+      priceChart.options.plugins.regimeShading.regimes = sampledPrice.series[4] || [];
+    }
+    priceChart.update("none");
+  };
+
+  const loadHistory = () => {
+    const limit = INTRADAY_TFS.has(selectedTf) ? 1200 : 400;
+    const params = new URLSearchParams();
+    params.set("tf", selectedTf);
+    params.set("limit", String(limit));
+    if (INTRADAY_TFS.has(selectedTf)) {
+      params.set("days", "7");
+    }
+    fetch(`/api/symbol/${encodeURIComponent(symbol)}/history?${params.toString()}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to fetch history"))))
+      .then((data) => {
+        const rows = sanitizeRows(data);
+        renderCharts(rows);
+        updateContext(rows.length ? rows[rows.length - 1] : null);
+      })
+      .catch(() => {
+        if (INTRADAY_TFS.has(selectedTf)) {
+          setDataMessage("No intraday bars yet. Enable INTRADAY_ENABLED and wait for ingestion.");
+        }
+      });
+  };
+
+  tfButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setActiveTf(btn.dataset.tf || "1d");
+      loadHistory();
+    });
+  });
+
+  setActiveTf(selectedTf);
+  loadHistory();
+
+  if (window.__symbolRefreshTimer) {
+    window.clearInterval(window.__symbolRefreshTimer);
+  }
+  window.__symbolRefreshTimer = window.setInterval(() => {
+    loadHistory();
+  }, 30_000);
+
+  window.addEventListener("beforeunload", () => {
+    if (window.__symbolRefreshTimer) {
+      window.clearInterval(window.__symbolRefreshTimer);
+      window.__symbolRefreshTimer = null;
+    }
+  });
+})();
+</script>
+{% endblock %}

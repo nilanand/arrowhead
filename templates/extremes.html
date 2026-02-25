@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Extremes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="extremes">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">ATH/ATL + drawdown analytics</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Item Extremes</h2>
+          <div class="status-meta" id="extremesMeta">Loading extremes...</div>
+        </div>
+      </div>
+
+      <form id="extremesForm" class="filter-grid" autocomplete="off" style="grid-template-columns: 1fr 1fr 1fr auto;">
+        <div class="field">
+          <label for="extremesSort">Sort</label>
+          <select id="extremesSort">
+            <option value="pct_off_ath" selected>Percent Off ATH</option>
+            <option value="mdd_24h">MDD 24h</option>
+            <option value="mdd_7d">MDD 7d</option>
+            <option value="mdd_30d">MDD 30d</option>
+            <option value="mdd_all">MDD All-time</option>
+            <option value="pct_above_atl">Percent Above ATL</option>
+            <option value="high_24h">High 24h</option>
+            <option value="low_24h">Low 24h</option>
+            <option value="high_7d">High 7d</option>
+            <option value="low_7d">Low 7d</option>
+            <option value="high_30d">High 30d</option>
+            <option value="low_30d">Low 30d</option>
+            <option value="ath_price">ATH Price</option>
+            <option value="atl_price">ATL Price</option>
+            <option value="ts">Updated TS</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="extremesOrder">Order</label>
+          <select id="extremesOrder">
+            <option value="desc" selected>Descending</option>
+            <option value="asc">Ascending</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="extremesLimit">Limit</label>
+          <input id="extremesLimit" type="number" min="1" step="1" value="200" />
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button type="submit">Refresh</button>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>% Off ATH</th>
+              <th>% Above ATL</th>
+              <th>ATH</th>
+              <th>ATL</th>
+              <th>High/Low 24h</th>
+              <th>High/Low 7d</th>
+              <th>High/Low 30d</th>
+              <th>MDD 24h</th>
+              <th>MDD 7d</th>
+              <th>MDD 30d</th>
+              <th>MDD All</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="extremesBody">
+            <tr><td colspan="13">Loading extremes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

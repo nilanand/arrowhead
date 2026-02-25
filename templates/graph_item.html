@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Graph Item</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/uPlot.min.css') }}" />
+</head>
+<body
+  data-page="graph-item"
+  data-item-key="{{ item_key }}"
+  data-default-horizon="{{ forecast.horizon_minutes if forecast else 120 }}"
+>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Canonical item trend chart</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">{{ display_name }}</h2>
+          <div class="status-meta">
+            <span class="cell-mono">{{ item_key }}</span>
+            <span>Tier: {{ tier }}</span>
+          </div>
+          <div class="status-meta" id="graphMeta">Loading chart data...</div>
+        </div>
+        <div class="inline-actions">
+          <button type="button" id="graphWatchToggle">☆ Watch</button>
+          <a class="btn secondary" href="/graphs">Back to Graphs</a>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Price Now</div>
+          <div class="value">{{ feature.price_now_fmt if feature else '-' }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Liquidity</div>
+          <div class="value">{{ '%.1f'|format(feature.liquidity_rank) if feature and feature.liquidity_rank is not none else '-' }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Regime</div>
+          <div class="value">{{ feature.regime_tag if feature else '-' }}</div>
+        </div>
+      </div>
+
+      <div class="status-meta" style="margin-top:10px;">
+        <span>ATH: {{ extreme.ath_price_fmt if extreme else '-' }}</span>
+        <span>ATL: {{ extreme.atl_price_fmt if extreme else '-' }}</span>
+        <span>% Off ATH: {{ ('%.2f%%'|format(extreme.pct_off_ath * 100.0)) if extreme and extreme.pct_off_ath is not none else '-' }}</span>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <div class="status-row" style="gap:14px; align-items:flex-end;">
+        <div class="inline-actions" id="graphWindowButtons" style="flex-wrap:wrap;">
+          <button type="button" data-window="1h">1h</button>
+          <button type="button" data-window="6h">6h</button>
+          <button type="button" data-window="24h" class="active">24h</button>
+          <button type="button" data-window="7d">7d</button>
+          <button type="button" data-window="30d">30d</button>
+          <button type="button" data-window="all">All</button>
+        </div>
+        <div class="field" style="min-width:180px;">
+          <label for="graphHorizon">nocom Horizon</label>
+          <select id="graphHorizon">
+            <option value="30">30m</option>
+            <option value="120" selected>120m</option>
+            <option value="360">360m</option>
+          </select>
+        </div>
+        <div class="inline-actions" style="flex-wrap:wrap;">
+          <label class="toggle"><input id="graphShowMinMax" type="checkbox" checked /><span>Min/Max</span></label>
+          <label class="toggle"><input id="graphShowEma" type="checkbox" checked /><span>EMA10/60</span></label>
+          <label class="toggle"><input id="graphShowMedian24" type="checkbox" checked /><span>24h median</span></label>
+          <label class="toggle"><input id="graphShowForecast" type="checkbox" checked /><span>nocom p10/p50/p90</span></label>
+          <label class="toggle"><input id="graphShowEvents" type="checkbox" checked /><span>Event dots</span></label>
+        </div>
+      </div>
+
+      <div id="graphError" class="error-banner" style="display:none;"></div>
+      <div id="graphPlot" style="width:100%; min-height:360px; margin-top:10px;"></div>
+      <div class="status-meta" id="graphHoverMeta" style="margin-top:8px;">Hover a point to inspect timestamp, median/min/max, samples.</div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Recent Events</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Severity</th>
+              <th>Title</th>
+            </tr>
+          </thead>
+          <tbody id="graphEventsBody">
+            <tr><td colspan="4">Loading events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="graphWatchToast" class="toast-banner" style="display:none;"></div>
+
+  <script src="{{ url_for('static', filename='vendor/uPlot.iife.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

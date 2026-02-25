@@ -1,0 +1,17 @@
+:root {
+  --font-mono: "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --bg: #000000;
+  --panel: #000000;
+  --panel-2: #000000;
+  --border: #ffffff;
+  --text-primary: #ffffff;
+  --text-muted: #ffffff;
+  --text-dim: #ffffff;
+  --accent: #ffffff;
+  --accent-soft: #ffffff;
+
+  --color-border: #ffffff;
+  --color-text: #ffffff;
+  --color-muted: #ffffff;
+  --color-accent: #ffffff;
+}

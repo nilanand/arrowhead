@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Auction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="auction">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Auction details + model context</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    {% if not auction %}
+      <section class="panel">
+        <h2 style="margin-top:0;">Auction not found</h2>
+        <p class="help">This UUID is not in the current local snapshot yet or already expired.</p>
+        <a class="btn" href="/">Back to search</a>
+      </section>
+    {% else %}
+      <section class="panel">
+        <div class="status-row" style="margin-bottom:18px;">
+          <div>
+            <h2 style="margin:0 0 6px 0;">{{ auction.item_name }}</h2>
+            <div class="status-meta">
+              <span class="tag {% if not auction.bin %}no{% endif %}">{{ 'BIN' if auction.bin else 'AUCTION' }}</span>
+              <span>{{ auction.tier }}</span>
+              <span>Seller: {{ auction.seller or 'Unknown' }}</span>
+            </div>
+          </div>
+          <div class="inline-actions">
+            <button type="button" id="copyViewAuction" data-command="{{ command }}">Copy /viewauction</button>
+            {% if graph_item_key %}
+              <a class="btn secondary" href="/graph/{{ graph_item_key|urlencode }}">Graph Item</a>
+            {% endif %}
+            <a class="btn secondary" href="/">Back</a>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <div class="label">Price</div>
+            <div class="value">{{ auction.price_fmt }}</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Ends In</div>
+            <div class="value">{{ auction.ends_in }}</div>
+          </div>
+          <div class="kpi">
+            <div class="label">UUID</div>
+            <div class="value cell-mono">{{ auction.uuid[:12] }}...</div>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <section class="panel" style="padding:14px;">
+            <h3 style="margin:0 0 10px 0;">Auction Data</h3>
+            <dl class="definition-list">
+              <dt>UUID</dt><dd class="cell-mono">{{ auction.uuid }}</dd>
+              <dt>Tier</dt><dd>{{ auction.tier }}</dd>
+              <dt>Category</dt><dd>{{ auction.category or '-' }}</dd>
+              <dt>BIN</dt><dd>{{ auction.bin }}</dd>
+              <dt>Price</dt><dd>{{ auction.price }}</dd>
+              <dt>Bids</dt><dd>{{ auction.bids_count }}</dd>
+              <dt>Ends In</dt><dd>{{ auction.ends_in }}</dd>
+              <dt>Seller</dt><dd>{{ auction.seller or '-' }}</dd>
+            </dl>
+          </section>
+
+          <section class="panel" style="padding:14px;">
+            <h3 style="margin:0 0 10px 0;">Feature Context</h3>
+            {% if feature %}
+              <dl class="definition-list">
+                <dt>Item Key</dt><dd class="cell-mono">{{ feature.item_key }}</dd>
+                <dt>Median 24h</dt><dd>{{ feature.median_24h_fmt }}</dd>
+                <dt>Z-score (24h)</dt><dd>{{ '%.3f'|format(feature.zscore_24h) }}</dd>
+                <dt>EMA Fast/Slow</dt><dd>{{ '%.1f'|format(feature.ema_fast) }} / {{ '%.1f'|format(feature.ema_slow) }}</dd>
+                <dt>Liquidity</dt><dd>{{ 'OK' if feature.liquidity_ok else 'LOW' }} ({{ feature.samples_1h }} / {{ feature.samples_24h }})</dd>
+              </dl>
+            {% else %}
+              <p class="help" style="margin:0;">No feature record available yet for this item key.</p>
+            {% endif %}
+
+            <h3 style="margin:14px 0 10px 0;">Recommendation</h3>
+            {% if recommendation %}
+              <dl class="definition-list">
+                <dt>Action</dt><dd>{{ recommendation.action }}</dd>
+                <dt>Score</dt><dd>{{ '%.3f'|format(recommendation.score) }}</dd>
+                <dt>Reason</dt><dd>{{ recommendation.reason }}</dd>
+                <dt>Target Buy</dt><dd>{{ recommendation.target_buy_fmt or '-' }}</dd>
+                <dt>Target Sell</dt><dd>{{ recommendation.target_sell_fmt or '-' }}</dd>
+              </dl>
+            {% else %}
+              <p class="help" style="margin:0;">No recommendation generated yet for this item.</p>
+            {% endif %}
+
+            <div style="margin-top:14px;">
+              <div class="help">In-game command</div>
+              <div class="cell-mono" style="margin-top:4px;">{{ command }}</div>
+            </div>
+          </section>
+        </div>
+      </section>
+    {% endif %}
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

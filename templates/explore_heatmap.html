@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Heatmap</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="heatmap">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">market structure heatmap</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="heatmapMeta">Loading heatmap...</div>
+        <div class="inline-actions">
+          <select id="heatmapTf">
+            <option value="1m">1m</option>
+            <option value="5m">5m</option>
+            <option value="1d" selected>1d</option>
+          </select>
+          <button type="button" id="heatmapRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symbol</th><th>Regime</th><th>Z-Score</th><th>Drawdown</th><th>Volatility</th><th>Volume %ile</th></tr></thead>
+          <tbody id="heatmapRows"><tr><td colspan="6">Loading heatmap...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Seasonality</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="seasonality">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">seasonality explorer</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="seasonalityMeta">Loading seasonality...</div>
+        <div class="inline-actions">
+          <input id="seasonalitySymbol" type="text" value="SPY" maxlength="12" style="width:90px; text-transform:uppercase;" />
+          <select id="seasonalityTf">
+            <option value="1d">1d</option>
+            <option value="1m">1m</option>
+          </select>
+          <button type="button" id="seasonalityRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Bucket</th><th>Mean Return</th><th>Median Return</th><th>Samples</th></tr></thead>
+          <tbody id="seasonalityRows"><tr><td colspan="4">Loading seasonality...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

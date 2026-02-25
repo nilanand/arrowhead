@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Signals</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="signals">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Predictive BUY/SELL engine</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Most Profitable Flips (BUY)</h2>
+          <div class="status-meta" id="signalsMeta">Loading ranked flips...</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="signalsOnlyLiquid" checked />
+          <span>Only liquid (&ge; min rank)</span>
+        </label>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>Score</th>
+              <th>Flip Score</th>
+              <th>Price Now</th>
+              <th>Expected Profit</th>
+              <th>Median 24h</th>
+              <th>Z-score</th>
+              <th>EMA Fast / Slow</th>
+              <th>Regime</th>
+              <th>Liquidity Rank</th>
+              <th>Backtest (W/A/DD)</th>
+              <th>Spark (6h)</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody id="buySignalsBody">
+            <tr><td colspan="13">Loading BUY recommendations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Recommended Sells</h2>
+      <div class="table-wrap" style="margin-top:0;">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Key</th>
+              <th>Score</th>
+              <th>Price Now</th>
+              <th>Z-score</th>
+              <th>EMA Fast / Slow</th>
+              <th>Regime</th>
+              <th>Liquidity Rank</th>
+              <th>Flip Score</th>
+              <th>Spark (6h)</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody id="sellSignalsBody">
+            <tr><td colspan="10">Loading SELL recommendations...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

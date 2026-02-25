@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Screener</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="screener">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">structural screener (signals mode: {{ signals_mode }})</span>
+      </div>
+      {% include "_nocom_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div class="status-meta" id="screenerMeta">Loading screener...</div>
+        <div class="inline-actions">
+          <select id="screenerTimeframe">
+            <option value="1m">1m</option>
+            <option value="5m">5m</option>
+            <option value="1d">1d</option>
+          </select>
+          <select id="screenerSort">
+            <option value="volatility_spike">Volatility Spike</option>
+            <option value="trend_strength">Trend Strength</option>
+            <option value="drawdown">Drawdown</option>
+            <option value="volume_anomaly">Volume Anomaly</option>
+          </select>
+          <button type="button" id="screenerRefreshBtn">Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Exchange</th>
+              <th>Regime</th>
+              <th>Volatility</th>
+              <th>Trend</th>
+              <th>Drawdown</th>
+              <th>Volume %ile</th>
+              <th>Signal Score</th>
+              <th>Signal</th>
+              <th>Open</th>
+            </tr>
+          </thead>
+          <tbody id="screenerRows">
+            <tr><td colspan="10">Loading screener...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='nocom.js') }}"></script>
+</body>
+</html>

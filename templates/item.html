@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Item</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="item" data-item-key="{{ item_key }}">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Item history and extremes</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Item: <span class="cell-mono">{{ item_key }}</span></h2>
+          <div class="status-meta" id="itemMeta">Loading item analytics...</div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label">Current Price</div>
+          <div class="value">{{ feature.price_now_fmt if feature else '-' }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">24h Median</div>
+          <div class="value">{{ feature.median_24h_fmt if feature else '-' }}</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Liquidity Rank</div>
+          <div class="value">{{ '%.1f'|format(feature.liquidity_rank) if feature and feature.liquidity_rank is not none else '-' }}</div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <section class="panel" style="padding:14px;">
+          <h3 style="margin:0 0 10px 0;">Snapshot</h3>
+          <dl class="definition-list">
+            <dt>Regime</dt><dd>{{ feature.regime_tag if feature else '-' }}</dd>
+            <dt>Recommendation</dt><dd>{{ recommendation.action if recommendation else '-' }}</dd>
+            <dt>Reason</dt><dd>{{ recommendation.reason if recommendation else '-' }}</dd>
+            <dt>nocom Return</dt><dd>{{ ('%.2f%%'|format(forecast.pred_return * 100.0)) if forecast else '-' }}</dd>
+            <dt>nocom Confidence</dt><dd>{{ ('%.3f'|format(forecast.confidence)) if forecast else '-' }}</dd>
+          </dl>
+        </section>
+
+        <section class="panel" style="padding:14px;">
+          <h3 style="margin:0 0 10px 0;">Extremes</h3>
+          <dl class="definition-list" id="itemExtremesDl">
+            <dt>ATH</dt><dd id="itemAth">-</dd>
+            <dt>ATL</dt><dd id="itemAtl">-</dd>
+            <dt>% Off ATH</dt><dd id="itemPctOffAth">-</dd>
+            <dt>% Above ATL</dt><dd id="itemPctAboveAtl">-</dd>
+            <dt>High/Low 24h</dt><dd id="itemHighLow24h">-</dd>
+            <dt>High/Low 7d</dt><dd id="itemHighLow7d">-</dd>
+            <dt>High/Low 30d</dt><dd id="itemHighLow30d">-</dd>
+          </dl>
+        </section>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Drawdown</h2>
+      <div class="status-meta" id="itemDrawdownMeta">Loading drawdowns...</div>
+      <div class="table-wrap" style="margin-top:8px;">
+        <table>
+          <thead>
+            <tr>
+              <th>MDD All</th>
+              <th>MDD 30d</th>
+              <th>MDD 7d</th>
+              <th>MDD 24h</th>
+              <th>Worst Peak</th>
+              <th>Worst Trough</th>
+            </tr>
+          </thead>
+          <tbody id="itemDrawdownBody">
+            <tr><td colspan="6">Loading drawdown stats...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2 style="margin:0 0 8px 0;">Story</h2>
+      <div class="status-meta" id="itemStoryMeta">Loading events...</div>
+      <div class="table-wrap" style="margin-top:8px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Severity</th>
+              <th>Title</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="itemStoryBody">
+            <tr><td colspan="5">Loading events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <div class="status-row">
+        <h2 style="margin:0;">History (Bars)</h2>
+        <form id="itemHistoryForm" class="inline-actions" autocomplete="off">
+          <label for="itemHistoryWindow" class="help">Window</label>
+          <select id="itemHistoryWindow">
+            <option value="24h" selected>24h</option>
+            <option value="7d">7d</option>
+            <option value="30d">30d</option>
+            <option value="all">All</option>
+          </select>
+          <label for="itemHistoryLimit" class="help">Limit</label>
+          <input id="itemHistoryLimit" type="number" min="1" step="1" value="2000" style="max-width:120px;" />
+          <button type="submit">Refresh</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Bar Time</th>
+              <th>Median</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Samples</th>
+            </tr>
+          </thead>
+          <tbody id="itemHistoryBody">
+            <tr><td colspan="5">Loading history...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

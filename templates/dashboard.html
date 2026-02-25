@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="panel">
+  <div class="section-title">status</div>
+  <div class="badge-row mono">
+    <span class="badge {% if status.running %}good{% else %}bad{% endif %}">
+      <span class="dot {% if status.running %}dot-good{% else %}dot-bad{% endif %}"></span>
+      {% if status.running %}running{% else %}stopped{% endif %}
+    </span>
+    <span class="badge">provider {{ provider_name }}</span>
+    <span class="badge">timeframe {{ timeframe }}</span>
+    <span class="badge">last poll {{ status.last_poll_ok_ts if status.last_poll_ok_ts else "—" }}</span>
+    <span class="badge">last daily bar {{ ts_to_date(payload.last_daily_bar_ts) if payload.last_daily_bar_ts else "—" }}</span>
+    <span class="badge">symbols {{ status.symbols_tracked }}</span>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">discord sender</div>
+  {% if discord_sender_available %}
+    <div class="sender-row">
+      <textarea
+        id="discordMessage"
+        class="sender-text"
+        maxlength="{{ sender_max_chars }}"
+        placeholder="Type a message..."
+      ></textarea>
+      <div class="sender-actions">
+        <button id="sendDiscordBtn" class="btn">Send</button>
+        <span id="sendDiscordStatus" class="mono"></span>
+      </div>
+    </div>
+  {% else %}
+    <div class="help">Set DISCORD_WEBHOOK_URL to enable.</div>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <div class="section-title">market weather</div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="kpi-sub mono">last trading date</div>
+      <div class="kpi">{{ ts_to_date(payload.last_daily_bar_ts) if payload.last_daily_bar_ts else "—" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">regime tag</div>
+      <div class="kpi">{{ payload.latest_regime.regime_tag if payload.latest_regime else "CHOP" }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">median volatility 20d</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.median_volatility_20d is not none %}
+          {{ "%.4f"|format(payload.latest_regime.median_volatility_20d) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">bars inserted last cycle</div>
+      <div class="kpi mono">{{ status.bars_inserted_last }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">features upserted last cycle</div>
+      <div class="kpi mono">{{ status.features_rows_upserted_last }}</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">breadth depth</div>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="kpi-sub mono">% > ema20</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.breadth_pct_above_ema20 is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.breadth_pct_above_ema20 * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">% > ema50</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.breadth_pct_above_ema50 is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.breadth_pct_above_ema50 * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">% > ema200</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.breadth_pct_above_ema200 is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.breadth_pct_above_ema200 * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">% positive 20d</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.pct_with_positive_20d_return is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.pct_with_positive_20d_return * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">% new 20d highs</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.new_20d_high_pct is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.new_20d_high_pct * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="kpi-sub mono">% new 20d lows</div>
+      <div class="kpi mono">
+        {% if payload.latest_regime and payload.latest_regime.new_20d_low_pct is not none %}
+          {{ "%.1f%%"|format(payload.latest_regime.new_20d_low_pct * 100) }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">market structure chart</div>
+  <div class="chart-wrap">
+    <canvas id="dashPriceChart"></canvas>
+  </div>
+  <div id="dashChartNote" class="help mono" style="margin-top:10px;"></div>
+</section>
+
+<section class="panel">
+  <div class="section-title">symbol table</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>symbol</th>
+          <th>date</th>
+          <th>close</th>
+          <th>ema_20</th>
+          <th>ema_50</th>
+          <th>ema_200</th>
+          <th>dist_52w</th>
+          <th>vol_pct_252d</th>
+          <th>regime</th>
+          <th>open</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if payload.rows %}
+          {% for row in payload.rows %}
+            <tr>
+              <td>{{ row.symbol }}</td>
+              <td>{{ row.bar_date }}</td>
+              <td class="mono">{{ "%.2f"|format(row.close) if row.close is not none else "—" }}</td>
+              <td class="mono">{{ "%.2f"|format(row.ema_20) if row.ema_20 is not none else "—" }}</td>
+              <td class="mono">{{ "%.2f"|format(row.ema_50) if row.ema_50 is not none else "—" }}</td>
+              <td class="mono">{{ "%.2f"|format(row.ema_200) if row.ema_200 is not none else "—" }}</td>
+              <td class="mono">{{ "%+.2f%%"|format(row.dist_from_52w_high * 100) if row.dist_from_52w_high is not none else "—" }}</td>
+              <td class="mono">{{ "%.1f"|format(row.vol_percentile_252d * 100) if row.vol_percentile_252d is not none else "—" }}</td>
+              <td><span class="tag">{{ row.regime_tag }}</span></td>
+              <td><a class="btn btn-small" href="/symbol/{{ row.symbol }}">open</a></td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="10">no symbols tracked yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(() => {
+  const C = window.ArrowheadCharts;
+  if (!C || typeof Chart === "undefined") {
+    return;
+  }
+  const WHITE = C.THEME.WHITE;
+  const DASH_CHART_ID = "dashPriceChart";
+
+  function getDashChart() {
+    return C.getOrCreateChart(DASH_CHART_ID, () => ({
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "% > EMA20",
+            data: [],
+            borderColor: "rgba(255,255,255,0.65)",
+            borderWidth: 1.2,
+            pointRadius: 0,
+            tension: 0.08,
+            spanGaps: true
+          },
+          {
+            label: "% > EMA50",
+            data: [],
+            borderColor: WHITE,
+            borderWidth: 1.5,
+            pointRadius: 0,
+            tension: 0.08,
+            spanGaps: true
+          },
+          {
+            label: "% > EMA200",
+            data: [],
+            borderColor: "rgba(255,255,255,0.40)",
+            borderWidth: 1,
+            pointRadius: 0,
+            tension: 0.08,
+            spanGaps: true
+          }
+        ]
+      },
+      options: C.commonOptions({
+        normalized: true,
+        animation: false,
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: C.makeMonochromeScales({
+          y: { suggestedMin: 0, suggestedMax: 1 }
+        })
+      })
+    }));
+  }
+
+  async function refreshDashChart() {
+    const chart = getDashChart();
+    if (!chart) {
+      return;
+    }
+    const note = document.getElementById("dashChartNote");
+
+    const response = await fetch("/api/market_structure?days=60", {cache: "no-store"});
+    if (!response.ok) {
+      if (note) {
+        note.textContent = "warming up: need more history";
+      }
+      return;
+    }
+
+    const payload = await response.json();
+    const labels = Array.isArray(payload?.labels) ? payload.labels.map((v) => String(v || "")) : [];
+    const series20 = Array.isArray(payload?.pct_above_ema20)
+      ? payload.pct_above_ema20.map((v) => C.toFiniteOrNull(v))
+      : [];
+    const series50 = Array.isArray(payload?.pct_above_ema50)
+      ? payload.pct_above_ema50.map((v) => C.toFiniteOrNull(v))
+      : [];
+    const series200 = Array.isArray(payload?.pct_above_ema200)
+      ? payload.pct_above_ema200.map((v) => C.toFiniteOrNull(v))
+      : [];
+
+    if (labels.length < 2) {
+      C.updateChart(chart, [], [[], [], []]);
+      if (note) {
+        note.textContent = String(payload?.message || "warming up: need more history");
+      }
+      return;
+    }
+
+    if (note) {
+      note.textContent = "";
+    }
+
+    const sampled = C.downsampleEven(labels, [series20, series50, series200], 1200);
+    C.updateChart(chart, sampled.labels, sampled.series);
+  }
+
+  function bootDashChart() {
+    refreshDashChart().catch(() => {});
+    if (window.__dashChartRefreshTimer) {
+      clearInterval(window.__dashChartRefreshTimer);
+    }
+    window.__dashChartRefreshTimer = window.setInterval(() => {
+      refreshDashChart().catch(() => {});
+    }, 30000);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootDashChart, {once: true});
+  } else {
+    bootDashChart();
+  }
+})();
+
+(() => {
+  const button = document.getElementById("sendDiscordBtn");
+  const messageEl = document.getElementById("discordMessage");
+  const statusEl = document.getElementById("sendDiscordStatus");
+  if (!button || !messageEl || !statusEl) {
+    return;
+  }
+
+  const setStatus = (message) => {
+    statusEl.textContent = message;
+  };
+
+  button.addEventListener("click", async () => {
+    const message = String(messageEl.value || "").trim();
+    if (!message) {
+      setStatus("message required");
+      return;
+    }
+
+    button.disabled = true;
+    setStatus("sending...");
+
+    try {
+      const resp = await fetch("/api/discord/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+      const payload = await resp.json().catch(() => ({}));
+      if (resp.ok && payload.ok) {
+        setStatus("sent");
+        messageEl.value = "";
+      } else {
+        setStatus(String(payload.error || "send failed"));
+      }
+    } catch (err) {
+      setStatus("network error");
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
+</script>
+{% endblock %}

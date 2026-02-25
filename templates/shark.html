@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nocom | Shark Mode</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body data-page="shark">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <h1>nocom</h1>
+        <span class="subtitle">Shark Mode deal sniper</span>
+      </div>
+      {% include "_nav.html" %}
+    </header>
+
+    <section class="panel">
+      <div class="status-row">
+        <div>
+          <h2 style="margin:0 0 6px 0;">Deal Detector</h2>
+          <div class="status-meta" id="sharkMeta">Loading Shark Mode status...</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="sharkEnabled" />
+          <span>Shark Mode ON</span>
+        </label>
+      </div>
+
+      <form id="sharkConfigForm" class="filter-grid" autocomplete="off">
+        <div class="field">
+          <label for="thresholdPct">Threshold % below median</label>
+          <input id="thresholdPct" type="number" min="1" max="95" step="1" />
+        </div>
+        <div class="field">
+          <label for="thresholdIqr">IQR multiplier</label>
+          <input id="thresholdIqr" type="number" min="0.1" max="10" step="0.1" />
+        </div>
+        <div class="field">
+          <label for="sharkMinPrice">Min price</label>
+          <input id="sharkMinPrice" type="number" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label for="sharkCooldown">Cooldown (minutes)</label>
+          <input id="sharkCooldown" type="number" min="0" step="1" />
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <div class="inline-actions">
+            <button type="submit">Save</button>
+            <button type="button" id="scanNowBtn" class="btn secondary">Scan Now</button>
+            <button type="button" id="testWebhookBtn" class="btn secondary">Test Discord Ping</button>
+            <button type="button" id="injectTestSharkBtn" class="btn secondary">Inject Test Shark (DEV)</button>
+          </div>
+        </div>
+      </form>
+      <div class="error-box" id="sharkError" style="display:none;"></div>
+      <div class="status-meta" id="sharkInjectResult" style="margin-top:8px;"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Tier</th>
+              <th>BIN Price</th>
+              <th>Median (24h)</th>
+              <th>% Below</th>
+              <th>Z-like score</th>
+              <th>Ends In</th>
+              <th>Open</th>
+            </tr>
+          </thead>
+          <tbody id="sharkDealsBody">
+            <tr><td colspan="8">Loading deals...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
