@@ -199,7 +199,7 @@
     chart.update("none");
   }
 
-  window.ArrowheadCharts = {
+  window.arrowheadCharts = {
     cssVar,
     THEME,
     deepMerge,

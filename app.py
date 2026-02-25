@@ -540,6 +540,15 @@ def home() -> object:
     return redirect("/dashboard", code=302)
 
 
+@app.get("/font_test")
+def font_test() -> object:
+    return render_template(
+        "font_test.html",
+        page_title="arrowhead | font test",
+        page_id="font_test",
+    )
+
+
 @app.get("/dashboard")
 def dashboard() -> object:
     with session_scope() as session:
@@ -547,7 +556,7 @@ def dashboard() -> object:
 
     return render_template(
         "dashboard.html",
-        page_title="Arrowhead | dashboard",
+        page_title="arrowhead | dashboard",
         page_id="dashboard",
         status=poller.get_status(),
         provider_name=str(getattr(provider, "name", "unknown")),
@@ -567,7 +576,7 @@ def symbol_page(symbol: str) -> object:
 
     return render_template(
         "symbol.html",
-        page_title=f"Arrowhead | symbol {payload['symbol']}",
+        page_title=f"arrowhead | symbol {payload['symbol']}",
         page_id="symbol",
         symbol=payload["symbol"],
         latest_bar=payload["latest_bar"],
@@ -879,5 +888,5 @@ def api_discord_send() -> object:
 if __name__ == "__main__":
     start_poller_if_needed()
     port = int(os.getenv("PORT", 5003))
-    print(f"Starting Arrowhead flask runtime on port={port}")
+    print(f"Starting arrowhead flask runtime on port={port}")
     app.run(host="0.0.0.0", port=port, debug=DEBUG)

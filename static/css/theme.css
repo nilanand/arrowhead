@@ -1,5 +1,6 @@
 :root {
   --font-mono: "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-brand: "BauhausHeavyBold", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --bg: #000000;
   --panel: #000000;
   --panel-2: #000000;

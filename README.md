@@ -1,8 +1,9 @@
-# Arrowhead
+# arrowhead
 
 ## overview
-Arrowhead is a macro telescope for observing market structure and regime context.
+arrowhead is tool I developed for observing market structure and regime context.
 The UI uses a command-terminal style that is primarily monochrome (black/white) with limited semantic green/red states.
+Temporary development artifacts matching `.tmp_*` are removed from the repository and ignored by default.
 
 It is observational only:
 
@@ -61,7 +62,7 @@ Default provider: `yahoo`
 - handles single and multi-ticker responses
 - missing symbol data is skipped with warning (no crash)
 
-If `DATA_PROVIDER` is set to a non-yahoo value, Arrowhead falls back to yahoo in default mode.
+If `DATA_PROVIDER` is set to a non-yahoo value, arrowhead falls back to yahoo in default mode.
 
 ## configuration
 Use `.env` (or `.env.example` as template):
@@ -90,9 +91,9 @@ Use `.env` (or `.env.example` as template):
 
 Backfill behavior:
 
-- on a fresh DB, Arrowhead backfills historical daily bars (default 420 days) so long-window context features populate quickly.
+- on a fresh DB, arrowhead backfills historical daily bars (default 420 days) so long-window context features populate quickly.
 - after initial fill, incremental polling fetches only a small patch window before the last known bar to avoid gaps.
-- if a symbol is still below `REQUIRED_TRADING_DAYS`, Arrowhead automatically re-enters deep backfill for that symbol and recomputes features until the floor is met.
+- if a symbol is still below `REQUIRED_TRADING_DAYS`, arrowhead automatically re-enters deep backfill for that symbol and recomputes features until the floor is met.
 
 Port behavior:
 
@@ -103,12 +104,12 @@ Port behavior:
 ### `market_bars`
 - PK: (`symbol`, `timeframe`, `bar_ts`)
 - fields: `open`, `high`, `low`, `close`, `volume`
-- timeframe used by Arrowhead: `1d`
+- timeframe used by arrowhead: `1d`
 
 ### `intraday_bars`
 - PK: (`symbol`, `bar_ts`)
 - fields: `open`, `high`, `low`, `close`, `volume`
-- cadence used by Arrowhead intraday mode: `1m` only
+- cadence used by arrowhead intraday mode: `1m` only
 - retention source constraint: Yahoo `1m` bars are provider-limited to a rolling ~7 day window
 
 ### `market_features`
@@ -171,6 +172,7 @@ UI:
 
 - `GET /dashboard`
 - `GET /symbol/<symbol>`
+- `GET /font_test`
 
 Dashboard panels:
 
@@ -292,8 +294,15 @@ python3 app.py
 - `http://localhost:5003/dashboard`
 - `http://localhost:5003/api/status`
 
+## font verification
+Manual checks:
+
+1. Visit `/static/fonts/Bauhaus-Heavy-Bold.ttf` (should download or render, not 404).
+2. Visit `/font_test` and compare glyphs to the local Font Book preview.
+3. In browser DevTools, inspect the header brand and confirm computed `font-family` includes `BauhausHeavyBold`.
+
 ## smoke test
-Run the lightweight Arrowhead smoke script:
+Run the lightweight arrowhead smoke script:
 
 ```bash
 python3 scripts/smoke_arrowhead.py
@@ -307,6 +316,38 @@ It verifies:
 - `/api/status` has non-null `last_daily_bar_ts`
 
 ## changelog
+### v0.16.7 - 2026-02-25
+Summary:
+- Applied Bauhaus header font + lowercase branding.
+- Removed unused temporary PNG artifacts.
+
+Technical details:
+- Added `static/fonts/Bauhaus-Heavy-Bold.ttf` and wired `@font-face` with `url("/static/fonts/Bauhaus-Heavy-Bold.ttf?v=1")`.
+- Scoped Bauhaus font usage to header only via `.brand-title` with pure white `#FFFFFF` styling and fallback fonts.
+- Added `GET /font_test` for visual font verification and linked the static font file.
+- Confirmed `.tmp_*.png` artifacts are removed and `.tmp_*` is ignored in `.gitignore`.
+
+### v0.16.6 - 2026-02-25
+Summary:
+- Applied Bauhaus header font + lowercase branding.
+- Removed unused temporary PNG artifacts.
+
+Technical details:
+- Added `static/fonts/Bauhaus-Heavy-Bold.ttf` and loaded it via `@font-face` in `static/styles.css`.
+- Scoped `BauhausHeavyBold` usage to the header brand only (`.brand-title`) with pure white `#FFFFFF` styling and fallback fonts.
+- Confirmed `.tmp_*.png` artifacts are unreferenced, deleted, and protected by the `.tmp_*` `.gitignore` rule.
+
+### v0.16.5 - 2026-02-25
+Summary:
+- Normalized branding to lowercase.
+- Updated header font styling.
+- Removed unused temporary PNG files.
+
+Technical details:
+- Updated brand text/title references to `arrowhead` in templates, README, and UI-facing strings.
+- Added a brand font stack centered on `Bauhaus Heavy-Bold` with safe local/system fallbacks and forced pure-white header rendering.
+- Deleted `.tmp_*` development image artifacts and added `.tmp_*` to `.gitignore`.
+
 ### v0.16.0 - 2026-02-25
 Summary:
 - Added lightweight intraday mode with 1-minute storage and dynamic 5m/15m resampling, isolated from daily systems.
@@ -339,7 +380,7 @@ Technical details:
 
 ### v0.16.2 - 2026-02-25
 Summary:
-- Added a manual Discord sender panel so Arrowhead can send user-written messages via webhook.
+- Added a manual Discord sender panel so arrowhead can send user-written messages via webhook.
 
 Technical details:
 - Added `services/discord_sender.py` with `send_discord_message(webhook_url, content)` helper.
@@ -350,7 +391,7 @@ Technical details:
 
 ### v0.16.1 - 2026-02-25
 Summary:
-- Switched Arrowhead UI to a black & white terminal theme with limited semantic color.
+- Switched arrowhead UI to a black & white terminal theme with limited semantic color.
 
 Technical details:
 - Removed neon green accents from panel chrome, headings, badges, and chart styling.
@@ -360,7 +401,7 @@ Technical details:
 
 ### v0.16.0 - 2026-02-25
 Summary:
-- Refined Arrowhead into telescope-mode macro observatory.
+- Refined arrowhead into telescope-mode macro observatory.
 - Added 200-day context, 52-week distance, volatility percentile, expanded breadth metrics, weekly toggle.
 
 Technical details:
@@ -393,19 +434,19 @@ Technical details:
 
 ### v0.15.1 - 2026-02-25
 Summary:
-- Centered and enlarged Arrowhead brand header; removed subtitle.
+- Centered and enlarged arrowhead brand header; removed subtitle.
 - Added automatic historical backfill for daily bars to ensure robust feature computation.
 
 Technical details:
-- UI header now uses centered `Arrowhead` brand layout with balanced left/right columns.
+- UI header now uses centered `arrowhead` brand layout with balanced left/right columns.
 - Poller now fetches up to `DAILY_BACKFILL_DAYS` on first run.
 - Incremental patch fetch uses `DAILY_PATCH_BUFFER_DAYS` to avoid gaps.
-- Daily bars rely on PK dedupe and are no longer pruned during Arrowhead polling.
+- Daily bars rely on PK dedupe and are no longer pruned during arrowhead polling.
 - Features recompute only when new bars are inserted.
 
 ### v0.15.0 - 2026-02-25
 Summary:
-- Rebuilt nocom into Arrowhead daily market trend observatory using free Yahoo Finance data.
+- Rebuilt nocom into arrowhead daily market trend observatory using free Yahoo Finance data.
 
 Technical details:
 - Provider: added yfinance-based Yahoo provider and made it default (no keys required).

@@ -1,5 +1,14 @@
 @import url("./css/theme.css");
 
+@font-face {
+  font-family: "BauhausHeavyBold";
+  src: url("/static/fonts/Bauhaus-Heavy-Bold.ttf?v=1") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+
 :root {
   --bg: #000000;
   --bg2: #000000;
@@ -82,14 +91,19 @@ a:hover {
 .brand {
   justify-self: center;
   font-size: 34px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
   text-decoration: none;
-  color: var(--text-primary);
 }
 
-.brand:hover {
-  color: var(--text-primary);
+.brand-title {
+  font-family: "BauhausHeavyBold", system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+  color: #FFFFFF !important;
+  text-transform: lowercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.brand-title:hover {
+  color: #FFFFFF !important;
 }
 
 .navlink {
@@ -1008,4 +1022,13 @@ tbody tr:hover,
     flex-wrap: nowrap;
     padding-bottom: 2px;
   }
+}
+
+/* Ensure brand header keeps Bauhaus font even with global mono !important rules */
+html body .brand-title {
+  font-family: "BauhausHeavyBold", system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+  color: #FFFFFF !important;
+  text-transform: lowercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }

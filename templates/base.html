@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ page_title or 'Arrowhead' }}</title>
+  <title>{{ page_title or 'arrowhead' }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
 </head>
@@ -11,7 +11,7 @@
   <main class="shell">
     <header class="topbar">
       <div class="topbar-left"></div>
-      <a class="brand" href="/dashboard">Arrowhead</a>
+      <a class="brand brand-title" href="/dashboard">arrowhead</a>
       <div class="topbar-right">
         <a class="navlink{% if request.path.startswith('/dashboard') %} active{% endif %}" href="/dashboard">dashboard</a>
       </div>

@@ -498,7 +498,7 @@ class MarketPoller:
 
         if computed_rows > 0:
             logger.info(
-                "Arrowhead market regime upserted rows=%s range=%s..%s latest=%s",
+                "arrowhead market regime upserted rows=%s range=%s..%s latest=%s",
                 int(computed_rows),
                 int(dates_to_compute[0]),
                 int(dates_to_compute[-1]),
@@ -769,7 +769,7 @@ class MarketPoller:
                     provider_endpoints.append("yahoo_download_1m")
                 latest_ts = max(after_map.values()) if after_map else None
                 logger.info(
-                    "Arrowhead daily cycle no-op: required_days=%s bars=%s features=%s fetched=%s windows=%s",
+                    "arrowhead daily cycle no-op: required_days=%s bars=%s features=%s fetched=%s windows=%s",
                     self.required_trading_days,
                     {s: int(bar_count_after.get(s, 0)) for s in symbols},
                     {s: int(feature_count_after.get(s, 0)) for s in symbols},
@@ -810,7 +810,7 @@ class MarketPoller:
             provider_endpoints.append("yahoo_download_1m")
 
         logger.info(
-            "Arrowhead daily cycle: required_days=%s bars=%s features=%s fetched=%s windows=%s dirty=%s inserted=%s",
+            "arrowhead daily cycle: required_days=%s bars=%s features=%s fetched=%s windows=%s dirty=%s inserted=%s",
             self.required_trading_days,
             {s: int(bar_count_after.get(s, 0)) for s in symbols},
             {s: int(feature_count_after.get(s, 0)) for s in symbols},
@@ -868,7 +868,7 @@ class MarketPoller:
                 try:
                     result = self._run_cycle()
                     logger.debug(
-                        "Arrowhead cycle ok: noop=%s bars_fetched=%s inserted=%s features=%s regime_ts=%s",
+                        "arrowhead cycle ok: noop=%s bars_fetched=%s inserted=%s features=%s regime_ts=%s",
                         result.get("noop"),
                         result.get("bars_fetched"),
                         result.get("bars_inserted"),
@@ -886,7 +886,7 @@ class MarketPoller:
                         last_error=str(exc),
                         backoff_until_ts=fail_ts + int(backoff_seconds),
                     )
-                    logger.error("Arrowhead poll cycle failed: %s", exc)
+                    logger.error("arrowhead poll cycle failed: %s", exc)
                     self._next_poll_ts = time.time() + max(backoff_seconds, self.poll_seconds)
 
             time.sleep(1)

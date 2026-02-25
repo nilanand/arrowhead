@@ -5,3 +5,4 @@ venv/
 *.db
 *.sqlite
 .DS_Store
+.tmp_*

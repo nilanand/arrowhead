@@ -296,7 +296,7 @@ def build_market_data_provider(provider_name: str | None) -> MarketDataProvider:
 
     if normalized != "yahoo":
         logger.warning(
-            "DATA_PROVIDER=%s is not enabled in Arrowhead default mode. Falling back to yahoo.",
+            "DATA_PROVIDER=%s is not enabled in arrowhead default mode. Falling back to yahoo.",
             normalized,
         )
         normalized = "yahoo"
